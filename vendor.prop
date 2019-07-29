@@ -158,6 +158,9 @@ ro.vendor.se.type=eSE,HCE,UICC
 # PASR
 vendor.power.pasr.enabled=true
 
+# PASR
+vendor.power.pasr.enabled=true
+
 # Perf
 ro.vendor.extension_library=libqti-perfd-client.so
 ro.vendor.perf.scroll_opt=true
