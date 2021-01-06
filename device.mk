@@ -227,6 +227,12 @@ PRODUCT_PACKAGES += \
     FM2 \
     qcom.fmradio
 
+# F2FS
+PRODUCT_PACKAGES += \
+    sg_write_buffer \
+    f2fs_io \
+    check_f2fs
+
 # GPS
 PRODUCT_PACKAGES += \
     android.hardware.gnss@1.1.vendor \
