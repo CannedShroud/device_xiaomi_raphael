@@ -158,6 +158,15 @@ on boot
 on boot && property:persist.vendor.usb.controller.default=*
     setprop vendor.usb.controller ${persist.vendor.usb.controller.default}
 
+on late-init
+    # Start services for bootanimation
+    start surfaceflinger
+    start themed_bootanimation
+    start bootanim
+    start vendor.hwcomposer-2-4
+    start vendor.configstore-hal
+    start vendor.qti.hardware.display.allocator
+
 on property:sys.boot_completed=1
     rm /data/unencrypted/zram_swap
     swapon_all /vendor/etc/fstab.qcom
