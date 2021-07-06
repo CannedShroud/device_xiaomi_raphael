@@ -36,4 +36,9 @@
         <item>com.google.android.gms/com.google.android.gms.nearby.discovery.service.DiscoveryService</item>
         <item>com.google.android.gms/com.google.android.gms.nearby.messages.service.NearbyMessagesService</item>
     </string-array>
+    
+    <!-- Defines the sysfs attribute path used by the device
+         to enable/disable DC dimming. -->
+         <string name="config_deviceDcDimmingSysfsNode">/sys/devices/platform/soc/soc:qcom,dsi-display-primary/msm_fb_ea_enable</string>
+
 </resources>
