@@ -34,15 +34,6 @@ on early-init
     symlink /data/tombstones /tombstones
 
 on init
-    write /dev/stune/foreground/schedtune.sched_boost_no_override 1
-    write /dev/stune/top-app/schedtune.sched_boost_no_override 1
-
-    write /dev/stune/schedtune.colocate 0
-    write /dev/stune/background/schedtune.colocate 0
-    write /dev/stune/system-background/schedtune.colocate 0
-    write /dev/stune/foreground/schedtune.colocate 0
-    write /dev/stune/top-app/schedtune.colocate 1
-
     wait /dev/block/platform/soc/1d84000.ufshc
     symlink /dev/block/platform/soc/1d84000.ufshc /dev/block/bootdevice
 
@@ -161,13 +152,13 @@ on property:sys.boot_completed=1
 
     # Foregroud
     write /dev/stune/foreground/schedtune.boost 0
-    write /dev/stune/top-app/schedtune.prefer_high_cap 0
-	write /dev/stune/top-app/schedtune.prefer_idle 1
+    write /dev/stune/foreground/schedtune.prefer_high_cap 0
+	write /dev/stune/foreground/schedtune.prefer_idle 1
     write /dev/cpuset/foreground/cpus 0-3,5-6
 
     # Top App
-    write /dev/stune/top-app/schedtune.boost 30
-    write /dev/stune/top-app/schedtune.prefer_high_cap 1
+    write /dev/stune/top-app/schedtune.boost 10
+    write /dev/stune/top-app/schedtune.prefer_high_cap 0
 	write /dev/stune/top-app/schedtune.prefer_idle 1
     write /dev/cpuset/top-app/cpus 0-7
 
@@ -178,10 +169,28 @@ on property:sys.boot_completed=1
     copy /dev/cpuset/cpus /dev/cpuset/restricted/cpus
     copy /dev/cpuset/mems /dev/cpuset/restricted/mems
     write /dev/cpuset/restricted/cpus 0-3
+    write /dev/cpuset/restricted/sched_load_balance  1
+    write /dev/cpuset/restricted/sched_relax_domain_level  -1
 
     # System-Background
     write /dev/cpuset/system-background/cpus 0-3
-    
+
+    # Scheduler Tunables
+    write /proc/sys/kernel/sched_cstate_aware 1
+    write /proc/sys/kernel/sched_enery_aware 1
+    write /proc/sys/kernel/sched_latency_ns 10000000
+    write /proc/sys/kernel/sched_lib_mask_force 255
+    write /proc/sys/kernel/sched_min_granularity_ns 3000000
+    write /proc/sys/kernel/sched_nr_migrate 32
+    write /proc/sys/kernel/sched_rr_timeslice_ms  90
+    write /proc/sys/kernel/sched_rt_period_us 1000000
+    write /proc/sys/kernel/sched_rt_runtime_us 950000
+    write /proc/sys/kernel/sched_schedstats  1
+    write /proc/sys/kernel/sched_sync_hint_enable 1
+    write /proc/sys/kernel/sched_tunable_scaling  1
+    write /proc/sys/kernel/sched_upmigrate 80
+    write /proc/sys/kernel/sched_child_runs_first 1
+
     # palm_sensor
     chown system system /sys/class/touch/touch_dev/palm_sensor
 
@@ -192,6 +201,9 @@ on property:sys.boot_completed=1
     setprop vendor.usb.dpl.inst.name "dpl"
     setprop vendor.usb.qdss.inst.name "qdss"
     setprop vendor.usb.controller a600000.dwc3
+
+    # GPU
+    write /sys/class/kgsl/kgsl-3d0/default_pwrlevel  4
 
     # Restrict permissions to socket file 
     # to hide Magisk & co.
