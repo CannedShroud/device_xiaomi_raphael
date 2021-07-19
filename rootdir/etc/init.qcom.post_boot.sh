@@ -133,36 +133,67 @@ case "$target" in
 	echo 30 > /proc/sys/kernel/sched_min_task_util_for_colocation 
 
 	# cpuset parameters
-	echo 0-2 > /dev/cpuset/background/cpus
+	echo 0-1 > /dev/cpuset/background/cpus
 	echo 0-3 > /dev/cpuset/system-background/cpus
 	echo 4-7 > /dev/cpuset/foreground/boost/cpus
-	echo 0-2,4-7 > /dev/cpuset/foreground/cpus
+	echo 0-3,5-6 > /dev/cpuset/foreground/cpus
 	echo 0-7 > /dev/cpuset/top-app/cpus
 
 	# Turn off scheduler boost at the end
 	echo 0 > /proc/sys/kernel/sched_boost
 
+	### SCHEDUTIL ###
 	# configure governor settings for silver cluster
-	echo "schedutil" > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor
-	echo 0 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/up_rate_limit_us
-        echo 0 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/down_rate_limit_us
-	echo 1209600 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/hispeed_freq
-	echo 576000 > /sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq
-	echo 1 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/pl
+	echo 500 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/up_rate_limit_us
+    echo 20000 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/down_rate_limit_us
+	echo 0 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/hispeed_freq
+	echo 90 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/hispeed_load
+	echo 0 > /sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq
+	echo 0 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/pl
+
 
 	# configure governor settings for gold cluster
-	echo "schedutil" > /sys/devices/system/cpu/cpufreq/policy4/scaling_governor
-	echo 0 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/up_rate_limit_us
-        echo 0 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/down_rate_limit_us
-	echo 1612800 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/hispeed_freq
-	echo 1 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/pl
+	echo 500 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/up_rate_limit_us
+    echo 20000 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/down_rate_limit_us
+	echo 0 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/hispeed_freq
+	echo 0 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/pl
+	echo 90 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/hispeed_load
+
 
 	# configure governor settings for gold+ cluster
-	echo "schedutil" > /sys/devices/system/cpu/cpufreq/policy7/scaling_governor
-	echo 0 > /sys/devices/system/cpu/cpufreq/policy7/schedutil/up_rate_limit_us
-        echo 0 > /sys/devices/system/cpu/cpufreq/policy7/schedutil/down_rate_limit_us
-	echo 1612800 > /sys/devices/system/cpu/cpufreq/policy7/schedutil/hispeed_freq
-	echo 1 > /sys/devices/system/cpu/cpufreq/policy7/schedutil/pl
+	echo 500 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/up_rate_limit_us
+    echo 20000 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/down_rate_limit_us
+	echo 0 > /sys/devices/system/cpu/cpufreq/policy7/schedutil/hispeed_freq
+	echo 0 > /sys/devices/system/cpu/cpufreq/policy7/schedutil/pl
+	echo 90 > /sys/devices/system/cpu/cpufreq/policy7/schedutil/hispeed_load
+
+	### BLU SCHEDUTIL ###
+	# configure governor settings for silver cluster
+	echo "blu_schedutil" > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor
+	echo 500 > /sys/devices/system/cpu/cpufreq/policy0/blu_schedutil/up_rate_limit_us
+    echo 20000 > /sys/devices/system/cpu/cpufreq/policy0/blu_schedutil/down_rate_limit_us
+	echo 0 > /sys/devices/system/cpu/cpufreq/policy0/blu_schedutil/hispeed_freq
+	echo 90 > /sys/devices/system/cpu/cpufreq/policy0/blu_schedutil/hispeed_load
+	echo 0 > /sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq
+	echo 0 > /sys/devices/system/cpu/cpufreq/policy0/blu_schedutil/pl
+
+
+	# configure governor settings for gold cluster
+	echo "blu_schedutil" > /sys/devices/system/cpu/cpufreq/policy4/scaling_governor
+	echo 500 > /sys/devices/system/cpu/cpufreq/policy0/blu_schedutil/up_rate_limit_us
+    echo 20000 > /sys/devices/system/cpu/cpufreq/policy0/blu_schedutil/down_rate_limit_us
+	echo 0 > /sys/devices/system/cpu/cpufreq/policy4/blu_schedutil/hispeed_freq
+	echo 0 > /sys/devices/system/cpu/cpufreq/policy4/blu_schedutil/pl
+	echo 90 > /sys/devices/system/cpu/cpufreq/policy4/blu_schedutil/hispeed_load
+
+
+	# configure governor settings for gold+ cluster
+	echo "blu_schedutil" > /sys/devices/system/cpu/cpufreq/policy7/scaling_governor
+	echo 500 > /sys/devices/system/cpu/cpufreq/policy0/blu_schedutil/up_rate_limit_us
+    echo 20000 > /sys/devices/system/cpu/cpufreq/policy0/blu_schedutil/down_rate_limit_us
+	echo 0 > /sys/devices/system/cpu/cpufreq/policy7/blu_schedutil/hispeed_freq
+	echo 0 > /sys/devices/system/cpu/cpufreq/policy7/blu_schedutil/pl
+	echo 90 > /sys/devices/system/cpu/cpufreq/policy7/blu_schedutil/hispeed_load
 
 	# configure input boost settings
 	echo "0:1324800" > /sys/module/cpu_boost/parameters/input_boost_freq
