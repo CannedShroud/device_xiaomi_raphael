@@ -753,6 +753,9 @@ vendor/lib64/libdiagjni.so
 vendor/etc/hdr_config.cfg
 vendor/etc/sdr_config.cfg
 
+# Display config from HentaiOS-raphael
+vendor/etc/qdcm_calib_data_samsung_ea8076_fhd_cmd_dsi_panel.xml
+
 # Display (Postprocessing) - from LA.UM.9.1.r1-10600-SMxxx0.0
 vendor/bin/hw/vendor.display.color@1.0-service|91e9e25ec4d64c4a7d5261899ca2cdb9cf29b695
 vendor/bin/ppd|57172f5d3b0b9bfc04f5eed93672d2b6f175d1f4
