@@ -386,6 +386,10 @@ PRODUCT_COPY_FILES += \
 # Thermal
 PRODUCT_PACKAGES += \
     android.hardware.thermal@2.0-service.xiaomi_msmnile
+    
+# QCOM Perf
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/qcom/msm_irqbalance.conf:$(TARGET_COPY_OUT_VENDOR)/etc/msm_irqbalance.conf
 
 # ZRAM writeback
 PRODUCT_PROPERTY_OVERRIDES += \
