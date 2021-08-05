@@ -18,6 +18,8 @@ $(call inherit-product, device/xiaomi/raphael/device.mk)
 # Inherit some common Lighthouse stuff.
 $(call inherit-product, vendor/lighthouse/config/common.mk)
 LIGHTHOUSE_BUILD_TYPE := OFFICIAL
+WITH_GAPPS := true
+SELINUX_IGNORE_NEVERALLOWS := true
 
 # Device identifier. This must come after all inclusions.
 PRODUCT_NAME := lighthouse_raphael

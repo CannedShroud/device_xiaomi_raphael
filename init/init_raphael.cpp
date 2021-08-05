@@ -117,7 +117,7 @@ void vendor_load_properties() {
         description = "raphaelin-user 10 QKQ1.190825.002 V12.0.6.0.QFKINXM release-keys";
         mod_device = "raphaelin_in_global";
     }
-    fingerprint = "google/redfin/redfin:11/RQ3A.210705.001/7380771:user/release-keys";
+    fingerprint = "google/redfin/redfin:11/RQ3A.210805.001.A1/7474174:user/release-keys";
     property_override("ro.apex.updatable", "false");
 
     // SafetyNet workaround
