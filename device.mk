@@ -418,6 +418,10 @@ PRODUCT_PACKAGES += \
     android.hardware.sensors@1.0-service \
     libsensorndkbridge
 
+# Thermal
+PRODUCT_PACKAGES += \
+    android.hardware.thermal@2.0-service.xiaomi_msmnile
+
 # Telephony
 PRODUCT_PACKAGES += \
     ims-ext-common \
