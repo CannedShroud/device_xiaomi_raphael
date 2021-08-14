@@ -115,17 +115,14 @@ BOARD_KERNEL_IMAGE_NAME := Image.gz-dtb
 BOARD_KERNEL_PAGESIZE := 4096
 TARGET_KERNEL_ARCH := arm64
 TARGET_KERNEL_HEADER_ARCH := arm64
-TARGET_KERNEL_ADDITIONAL_FLAGS := AS=llvm-as AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip
-TARGET_KERNEL_CLANG_COMPILE := true
-TARGET_KERNEL_CLANG_VERSION := proton
+TARGET_KERNEL_NEW_GCC_COMPILE := true 
 TARGET_KERNEL_CONFIG := raphael_defconfig
 TARGET_KERNEL_SOURCE := kernel/xiaomi/raphael
+
 TARGET_KERNEL_CROSS_COMPILE_PREFIX := aarch64-elf-
-KERNEL_TOOLCHAIN := $(PWD)/prebuilts/gcc/linux-x86/aarch64/aarch64-elf/bin
-TARGET_GCC_ARM32_TOOLCHAIN := $(PWD)/prebuilts/gcc/linux-x86/arm/arm-eabi/bin/arm-eabi-
-KERNEL_LD := LD=$(PWD)/prebuilts/gcc/linux-x86/aarch64/aarch64-elf/bin/aarch64-elf-ld.lld \
-             CROSS_COMPILE_ARM32=$(TARGET_GCC_ARM32_TOOLCHAIN)
-TARGET_KERNEL_NEW_GCC_COMPILE := true  
+KERNEL_TOOLCHAIN := $(shell pwd)/prebuilts/gcc/linux-x86/aarch64/aarch64-elf/bin
+TARGET_GCC_ARM32_TOOLCHAIN := $(shell pwd)/prebuilts/gcc/linux-x86/arm/arm-eabi/bin/arm-eabi-
+
 #Disable appended dtb
 TARGET_KERNEL_APPEND_DTB := true
 # Set Header version for bootimage
