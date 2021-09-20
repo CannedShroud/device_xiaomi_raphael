@@ -196,3 +196,6 @@ wifi.aware.interface=wifi-aware0
 
 # Freezer
 persist.device_config.use_cgroup_freezer=true
+
+#Touchfeature
+ro.vendor.touchfeature.gamemode.enable=true
