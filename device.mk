@@ -31,8 +31,7 @@ include build/make/target/product/iorap_large_memory_config.mk
 
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += \
-    $(LOCAL_PATH) \
-    hardware/xiaomi
+    $(LOCAL_PATH)
 
 # Hardware
 PRODUCT_COPY_FILES += \
