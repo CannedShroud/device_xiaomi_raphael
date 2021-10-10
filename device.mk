@@ -371,6 +371,7 @@ PRODUCT_PACKAGES += \
     android.hardware.power-service-qti
 
 # QMI
+$(call inherit-product, external/json-c/Android.configure.mk)
 PRODUCT_PACKAGES += \
     libjson
 
