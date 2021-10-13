@@ -81,7 +81,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     android.hardware.keymaster@4.1.vendor \
     android.hardware.gatekeeper@1.0.vendor \
-    android.hardware.biometrics.fingerprint@2.1.vendor \
     android.hardware.radio@1.5.vendor \
     android.hardware.gnss@1.1.vendor \
     android.hardware.bluetooth@1.0.vendor \
