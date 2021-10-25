@@ -458,7 +458,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     android.hardware.wifi@1.0-service \
     hostapd \
-    libwifi-hal-ctrl \b1b9bc2abb7ac958a30538ed166643d923fe2dd0
+    libwifi-hal-ctrl \
     libwifi-hal-qcom \
     libwpa_client \
     vendor.qti.hardware.wifi.hostapd@1.2.vendor \
