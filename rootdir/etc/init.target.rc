@@ -27,18 +27,13 @@
 #
 #
 
+import /vendor/etc/init/init.mi_thermald.rc
+
 on early-init
     write /proc/sys/kernel/sched_boost 1
+    symlink /data/tombstones /tombstones
 
 on init
-    write /dev/stune/foreground/schedtune.sched_boost_no_override 1
-    write /dev/stune/top-app/schedtune.sched_boost_no_override 1
-    write /dev/stune/schedtune.colocate 0
-    write /dev/stune/background/schedtune.colocate 0
-    write /dev/stune/system-background/schedtune.colocate 0
-    write /dev/stune/foreground/schedtune.colocate 0
-    write /dev/stune/top-app/schedtune.colocate 1
-    write /sys/module/qpnp_rtc/parameters/poweron_alarm 1
     wait /dev/block/platform/soc/1d84000.ufshc
     symlink /dev/block/platform/soc/1d84000.ufshc /dev/block/bootdevice
 
@@ -66,21 +61,9 @@ on init
     chown cameraserver cameraserver /dev/cpuset/camera-daemon/tasks
     chmod 0660 /dev/cpuset/camera-daemon/tasks
 
-    # ZRAM parameters
+    # ZRAM setup
     write /sys/block/zram0/comp_algorithm lz4
     write /proc/sys/vm/page-cluster 0
-
-    # Boot time fs tuning
-    write /sys/block/sda/queue/iostats 0
-    write /sys/block/sda/queue/scheduler cfq
-    write /sys/block/sda/queue/iosched/slice_idle 0
-    write /sys/block/sda/queue/read_ahead_kb 2048
-    write /sys/block/sda/queue/nr_requests 256
-    write /sys/block/sde/queue/iostats 0
-    write /sys/block/sde/queue/scheduler cfq
-    write /sys/block/sde/queue/iosched/slice_idle 0
-    write /sys/block/sde/queue/read_ahead_kb 2048
-    write /sys/block/sde/queue/nr_requests 256
 
 on early-fs
     start vold
@@ -88,22 +71,12 @@ on early-fs
 on fs
     start hwservicemanager
     mount_all /vendor/etc/fstab.qcom --early
-    chown root system /mnt/vendor/persist
-    chmod 0771 /mnt/vendor/persist
-    restorecon_recursive /mnt/vendor/persist
+
     mkdir /mnt/vendor/persist/data 0700 system system
-
-on post-fs
-    # set RLIMIT_MEMLOCK to 64MB
-    setrlimit 8 67108864 67108864
-
-    start vendor.spdaemon
-    start vendor.sec_nvm
-
-    mkdir /mnt/vendor/dsp 0770 root root
-    copy /vendor/dsp/cdsp/fastrpc_shell_3 /mnt/vendor/dsp/fastrpc_shell_3
-    chmod 0644 /mnt/vendor/dsp/fastrpc_shell_3
-    mount none /mnt/vendor/dsp/fastrpc_shell_3 /vendor/dsp/cdsp/fastrpc_shell_3 bind
+    mkdir /mnt/vendor/persist/audio 0755 system system
+    mkdir /mnt/vendor/persist/subsys 0770 root system
+    mkdir /mnt/vendor/persist/camera 0777 root root
+    restorecon_recursive /mnt/vendor/persist
 
     mkdir /mnt/vendor/dsp 0770 root root
     copy /vendor/dsp/cdsp/fastrpc_shell_3 /mnt/vendor/dsp/fastrpc_shell_3
@@ -121,59 +94,33 @@ on post-fs-data
     mkdir /tombstones/lpass 0771 system system
     mkdir /tombstones/wcnss 0771 system system
     mkdir /tombstones/dsps 0771 system system
-    mkdir /data/vendor/hbtp 0750 system system
+
     mkdir /data/vendor/nnhal 0700 system system
+    mkdir /data/vendor/thermal 0771 root system
+    mkdir /data/vendor/thermal/config 0771 root system
+    mkdir /data/vendor/nfc 0770 nfc nfc
+
+    chmod 0644 /dev/elliptic0
+    chmod 0644 /dev/elliptic1
+
+    chown system system /dev/tfa_reg
+    chown system system /dev/tfa_rw
+    chown system system /dev/tfa_rpc
+    chown system system /dev/tfa_control
+    chmod 0660 /dev/tfa_reg
+    chmod 0660 /dev/tfa_rw
+    chmod 0660 /dev/tfa_rpc
+    chmod 0660 /dev/tfa_control
 
 on early-boot
     start vendor.sensors
 
-# For cpusets initialize for Silver Only first and then Silver + Gold
-# Silver Only configuration cannot work with 0-7
 on boot
     chown system system /sys/kernel/hbtp/display_pwr
     chown system system /sys/kernel/qvr_external_sensor/fd
-    start rmt_storage
-    start rfs_access
-    write /dev/cpuset/top-app/cpus 0-3
-    write /dev/cpuset/audio-app/cpus 1-2
-    write /dev/cpuset/foreground/cpus 0-3
-    write /dev/cpuset/foreground/boost/cpus 0-3
-    write /dev/cpuset/background/cpus 0-3
-    write /dev/cpuset/system-background/cpus 0-3
-    write /dev/cpuset/top-app/cpus 0-7
-    write /dev/cpuset/foreground/cpus 0-7
-    write /dev/cpuset/foreground/boost/cpus 0-7
-    write /dev/cpuset/background/cpus 0-7
-    write /dev/cpuset/system-background/cpus 0-7
-
-    # set default schedTune value for camera-daemon
-    write /dev/stune/camera-daemon/schedtune.prefer_idle 1
-    write /dev/stune/camera-daemon/schedtune.boost 0
-
-#USB controller configuration
-    setprop vendor.usb.rndis.func.name "gsi"
-    setprop vendor.usb.rmnet.func.name "gsi"
-    setprop vendor.usb.rmnet.inst.name "rmnet"
-    setprop vendor.usb.dpl.inst.name "dpl"
-    setprop vendor.usb.qdss.inst.name "qdss"
-    setprop vendor.usb.controller a600000.dwc3
-
-on boot && property:persist.vendor.usb.controller.default=*
-    setprop vendor.usb.controller ${persist.vendor.usb.controller.default}
-
-on late-init
-    # Start services for bootanimation
-    start surfaceflinger
-    start themed_bootanimation
-    start bootanim
-    start vendor.hwcomposer-2-4
-    start vendor.configstore-hal
-    start vendor.qti.hardware.display.allocator
+    chown system system /sys/class/thermal/thermal_message/sconfig
 
 on property:sys.boot_completed=1
-    rm /data/unencrypted/zram_swap
-    swapon_all /vendor/etc/fstab.qcom
-    write /proc/sys/vm/swappiness 100
 
     # Runtime fs tuning
     write /sys/block/sda/queue/read_ahead_kb 128
@@ -182,13 +129,108 @@ on property:sys.boot_completed=1
     write /sys/block/sde/queue/read_ahead_kb 128
     write /sys/block/sde/queue/nr_requests 128
     write /sys/block/sde/queue/iostats 1
-#pd-mapper
+
+    # First initialize silver only cpus
+    write /dev/cpuset/audio-app/cpus 1-2
+
+    # Background
+    write /dev/stune/background/schedtune.boost 0
+    write /dev/stune/background/schedtune.prefer_high_cap 0
+	write /dev/stune/background/schedtune.prefer_idle 0
+    write /dev/cpuset/background/cpus 0-1
+
+    # Add a cpuset for the camera daemon
+    # We want all cores for camera
+    mkdir /dev/cpuset/camera-daemon
+    write /dev/cpuset/camera-daemon/cpus 0-7
+    write /dev/stune/camera-daemon/schedtune.prefer_high_cap 0
+	write /dev/stune/camera-daemon/schedtune.prefer_idle 1
+    write /dev/cpuset/camera-daemon/mems 0
+    chown cameraserver cameraserver /dev/cpuset/camera-daemon
+    chown cameraserver cameraserver /dev/cpuset/camera-daemon/tasks
+    chmod 0660 /dev/cpuset/camera-daemon/tasks
+
+    # Foregroud
+    write /dev/stune/foreground/schedtune.boost 0
+    write /dev/stune/foreground/schedtune.prefer_high_cap 0
+	write /dev/stune/foreground/schedtune.prefer_idle 1
+    write /dev/cpuset/foreground/cpus 0-3,5-6
+
+    # Top App
+    write /dev/stune/top-app/schedtune.boost 10
+    write /dev/stune/top-app/schedtune.prefer_high_cap 0
+	write /dev/stune/top-app/schedtune.prefer_idle 1
+    write /dev/cpuset/top-app/cpus 0-7
+
+    # Restricted
+    chown system system /dev/cpuset/restricted/tasks
+    chmod 0664 /dev/cpuset/restricted/tasks
+    mkdir /dev/cpuset/restricted
+    copy /dev/cpuset/cpus /dev/cpuset/restricted/cpus
+    copy /dev/cpuset/mems /dev/cpuset/restricted/mems
+    write /dev/cpuset/restricted/cpus 0-3
+    write /dev/cpuset/restricted/sched_load_balance  1
+    write /dev/cpuset/restricted/sched_relax_domain_level  -1
+
+    # System-Background
+    write /dev/cpuset/system-background/cpus 0-3
+
+    # Scheduler Tunables
+    write /proc/sys/kernel/sched_cstate_aware 1
+    write /proc/sys/kernel/sched_enery_aware 1
+    write /proc/sys/kernel/sched_latency_ns 10000000
+    write /proc/sys/kernel/sched_lib_mask_force 255
+    write /proc/sys/kernel/sched_min_granularity_ns 3000000
+    write /proc/sys/kernel/sched_nr_migrate 32
+    write /proc/sys/kernel/sched_rr_timeslice_ms  90
+    write /proc/sys/kernel/sched_rt_period_us 1000000
+    write /proc/sys/kernel/sched_rt_runtime_us 950000
+    write /proc/sys/kernel/sched_schedstats  1
+    write /proc/sys/kernel/sched_sync_hint_enable 1
+    write /proc/sys/kernel/sched_tunable_scaling  1
+    write /proc/sys/kernel/sched_upmigrate 80
+    write /proc/sys/kernel/sched_child_runs_first 1
+
+    # palm_sensor
+    chown system system /sys/class/touch/touch_dev/palm_sensor
+
+    #USB controller configuration
+    setprop vendor.usb.rndis.func.name "gsi"
+    setprop vendor.usb.rmnet.func.name "gsi"
+    setprop vendor.usb.rmnet.inst.name "rmnet"
+    setprop vendor.usb.dpl.inst.name "dpl"
+    setprop vendor.usb.qdss.inst.name "qdss"
+    setprop vendor.usb.controller a600000.dwc3
+
+    # GPU
+    write /sys/class/kgsl/kgsl-3d0/default_pwrlevel  4
+
+    # Restrict permissions to socket file 
+    # to hide Magisk & co.
+    chmod 440 /proc/net/unix
+
+    # Enable ZRAM on boot_complete
+    rm /data/unencrypted/zram_swap
+    swapon_all
+    write /proc/sys/vm/swappiness 100
+
+    # Restrict permissions to socket file 
+    # to hide Magisk & co.
+    chmod 440 /proc/net/unix
+
+on property:vendor.post_boot.parsed=1
+    # Enable idle state listener
+    write /sys/class/drm/card0/device/idle_encoder_mask 1
+    write /sys/class/drm/card0/device/idle_timeout_ms 100
+
+    # Enable PowerHAL hint processing
+    setprop vendor.powerhal.init 1
+
 service vendor.pd_mapper /vendor/bin/pd-mapper
     class core
     user system
     group system
 
-#Peripheral manager
 service vendor.per_mgr /vendor/bin/pm-service
     class core
     user system
@@ -201,21 +243,24 @@ service vendor.per_proxy /vendor/bin/pm-proxy
     group system
     disabled
 
+on property:init.svc.vendor.per_mgr=running
+    start vendor.per_proxy
+
+on property:sys.shutdown.requested=*
+    stop vendor.per_proxy
+
 on charger
-    start vendor.power_off_alarm
+    wait /dev/block/bootdevice/by-name/system
+    mount ext4 /dev/block/bootdevice/by-name/system / ro barrier=1
+
+    mkdir /mnt/vendor/persist 0771 root system
+    wait /dev/block/platform/soc/1d84000.ufshc/by-name/persist
+    mount ext4 /dev/block/bootdevice/by-name/persist /mnt/vendor/persist nosuid nodev barrier=1
+
     setprop sys.usb.controller a600000.dwc3
     setprop sys.usb.configfs 1
-
-service vendor.spdaemon /vendor/bin/spdaemon
-    class core
-    user system
-    group system
-    shutdown critical
-
-service vendor.sec_nvm /vendor/bin/sec_nvm
-    class core
-    user system
-    group system
+    start vendor.qcom-post-boot
+    start vendor.hvdcp_opti
 
 service vendor.thermal-engine /vendor/bin/thermal-engine
    class main
@@ -226,17 +271,16 @@ service vendor.thermal-engine /vendor/bin/thermal-engine
    socket thermal-send-rule stream 0660 system system
    group root
 
-service vendor.lowi /vendor/bin/sscrpcd
-   class core
-   user system
-   group system wakelock
-   capabilities BLOCK_SUSPEND
-
-service vendor.energy-awareness /vendor/bin/energy-awareness
-    class main
+service nv_mac /vendor/bin/nv_mac
+    class late_start
     user system
-    group system
+    group system inet net_admin wifi net_raw
     oneshot
+
+service remosaic_daemon /vendor/bin/remosaic_daemon
+   class late_start
+   user camera
+   group camera
 
 service dcvs-sh /vendor/bin/init.qti.dcvs.sh
     class late_start
@@ -247,11 +291,3 @@ service dcvs-sh /vendor/bin/init.qti.dcvs.sh
 
 on property:vendor.dcvs.prop=1
    start dcvs-sh
-
-service vendor.contexthub-hal-1-0 /vendor/bin/hw/android.hardware.contexthub@1.0-service
-    override
-    class hal
-    interface android.hardware.contexthub@1.0::IContexthub default
-    user system
-    group system
-    disabled
